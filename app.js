@@ -106,9 +106,15 @@ function mostrarQuiz(marcador) {
         <div class="quiz-modal">
             <div class="quiz-contenido">
                 <h3>${marcador.quiz.question}</h3>
-                ${Object.entries(marcador.quiz.options).map(([opcion, texto]) => `
-                    <button class="opcion" data-opcion="${opcion}">${texto}</button>
-                `).join('')}
+                <div class="opciones-grid">
+                    ${Object.entries(marcador.quiz.options).map(([opcion, texto]) => `
+                        <button class="opcion" 
+                                data-opcion="${opcion}"
+                                data-correct="${opcion === marcador.quiz.options.correct}">
+                            ${texto}
+                        </button>
+                    `).join('')}
+                </div>
                 <div id="resultado-quiz"></div>
             </div>
         </div>
@@ -119,20 +125,30 @@ function mostrarQuiz(marcador) {
     // Manejar respuestas
     document.querySelectorAll('.opcion').forEach(boton => {
         boton.addEventListener('click', (e) => {
-            const opcion = e.target.dataset.opcion;
+            const esCorrecta = e.target.dataset.correct === 'true';
+            const opcionCorrecta = marcador.quiz.options.correct;
+            
+            // Mostrar todas las respuestas
+            document.querySelectorAll('.opcion').forEach(op => {
+                if (op.dataset.opcion === opcionCorrecta) {
+                    op.classList.add('correcta');
+                }
+                if (op.dataset.opcion === e.target.dataset.opcion && !esCorrecta) {
+                    op.classList.add('incorrecta');
+                }
+                op.disabled = true;
+            });
+
             const resultado = document.getElementById('resultado-quiz');
-            
-            if (opcion === marcador.quiz.options.correct) {
-                resultado.textContent = "✅ ¡Correcto!";
-                resultado.style.color = "green";
-            } else {
-                resultado.textContent = "❌ Incorrecto. Intenta de nuevo";
-                resultado.style.color = "red";
-            }
-            
+            resultado.textContent = esCorrecta 
+                ? "✅ ¡Respuesta correcta!" 
+                : "❌ Respuesta incorrecta";
+            resultado.style.color = esCorrecta ? "#2ecc71" : "#e74c3c";
+
             setTimeout(() => {
                 document.querySelector('.quiz-modal').remove();
                 quizActivo = false;
+                marcadorActual = null;
             }, 3000);
         });
     });
