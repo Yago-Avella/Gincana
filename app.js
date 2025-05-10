@@ -1,4 +1,6 @@
 let lastUpdate = 0;
+let quizActivo = false;
+let marcadorActual = null;
 const UPDATE_INTERVAL = 1000;
 
 document.addEventListener('DOMContentLoaded', () => {
