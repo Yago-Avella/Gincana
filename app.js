@@ -3,51 +3,49 @@ const UPDATE_INTERVAL = 1000;
 
 document.addEventListener('DOMContentLoaded', () => {
     const distanceElement = document.getElementById('distance-value');
-    
-    // Estado inicial
     distanceElement.textContent = "0m";
 
-    document.getElementById('activate-geo').addEventListener('click', () => {
-        if (!navigator.geolocation) {
-            alert("Tu navegador no soporta geolocalización.");
-            return;
-        }
-        
-        navigator.geolocation.watchPosition(
-            async (position) => {
-                const now = Date.now();
-                if (now - lastUpdate > UPDATE_INTERVAL) {
-                    lastUpdate = now;
+    if (!navigator.geolocation) {
+        distanceElement.textContent = "Error navegador";
+        return;
+    }
+
+    // Activar geolocalización automáticamente
+    navigator.geolocation.watchPosition(
+        async (position) => {
+            const now = Date.now();
+            if (now - lastUpdate > UPDATE_INTERVAL) {
+                lastUpdate = now;
+                
+                try {
+                    const response = await fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json');
+                    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                    const data = await response.json();
                     
-                    try {
-                        const response = await fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json');                        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-                        const data = await response.json();
-                        
-                        const nearest = calcularDistanciaMasCercana(
-                            position.coords.latitude,
-                            position.coords.longitude,
-                            data.markers
-                        );
-                        
-                        actualizarInterfaz(nearest);
-                    } 
-                    catch (error) {
-                        console.error("Error:", error);
-                        distanceElement.textContent = "Error";
-                    }
+                    const nearest = calcularDistanciaMasCercana(
+                        position.coords.latitude,
+                        position.coords.longitude,
+                        data.markers
+                    );
+                    
+                    actualizarInterfaz(nearest);
+                } 
+                catch (error) {
+                    console.error("Error:", error);
+                    distanceElement.textContent = "Error";
                 }
-            },
-            (error) => {
-                console.error("Error geolocalización:", error);
-                distanceElement.textContent = "Activa la geolocalización";
-            },
-            {
-                enableHighAccuracy: true,
-                maximumAge: 30000,
-                timeout: 5000
             }
-        );
-    });
+        },
+        (error) => {
+            console.error("Error geolocalización:", error);
+            distanceElement.textContent = "Activa la geolocalización";
+        },
+        {
+            enableHighAccuracy: true,
+            maximumAge: 30000,
+            timeout: 5000
+        }
+    );
 });
 
 // Función de cálculo de distancia (corregida)
@@ -97,4 +95,7 @@ console.log(haversine(
 ));
 
 // Distancia Madrid-Barcelona (debería dar ~483,000m)
-console.log(haversine(40.4168, -3.7038, 41.3851, 2.1734));
+console.log(haversine(
+    38.7409, -0.0123,  // Iglesia Xaló (corregida)
+    38.7409, -0.0123   // Misma ubicación
+  ));
