@@ -3,59 +3,51 @@ const UPDATE_INTERVAL = 1000;
 
 document.addEventListener('DOMContentLoaded', () => {
     const distanceElement = document.getElementById('distance-value');
-    const equationElement = document.querySelector('.equation');
     
-    // Estado inicial más claro
+    // Estado inicial
     distanceElement.textContent = "0m";
-    equationElement.textContent = "(7, z + m)";
 
-    if (!navigator.geolocation) {
-        equationElement.textContent = "Error: Geolocalización no soportada";
-        return;
-    }
-
-    const watchId = navigator.geolocation.watchPosition( // Usar watchPosition
-        async (position) => {
-            const now = Date.now();
-            if (now - lastUpdate > UPDATE_INTERVAL) {
-                lastUpdate = now;
-                
-                try {
-                    // 1. Cargar marcadores
-                    const response = await fetch('https://github.com/Yago-Avella/Gincana/blob/main/locations.json');
-                    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-                    const data = await response.json();
-
-                    
-                    
-                    // 2. Calcular distancia
-                    const nearest = calcularDistanciaMasCercana(
-                        position.coords.latitude,
-                        position.coords.longitude,
-                        data.markers
-                    );
-                    
-                    // 3. Actualizar interfaz
-                    actualizarInterfaz(nearest);
-                } 
-                catch (error) {
-                    console.error("Error en el proceso:", error);
-                    distanceElement.textContent = "Error";
-                    equationElement.textContent = "(7, z + m)";
-                }
-            }
-        },
-        (error) => {
-            console.error("Error de geolocalización:", error);
-            equationElement.textContent = "Activa la geolocalización";
-            distanceElement.textContent = "Error";
-        },
-        {
-            enableHighAccuracy: true,
-            maximumAge: 30000,
-            timeout: 5000
+    document.getElementById('activate-geo').addEventListener('click', () => {
+        if (!navigator.geolocation) {
+            alert("Tu navegador no soporta geolocalización.");
+            return;
         }
-    );
+        
+        navigator.geolocation.watchPosition(
+            async (position) => {
+                const now = Date.now();
+                if (now - lastUpdate > UPDATE_INTERVAL) {
+                    lastUpdate = now;
+                    
+                    try {
+                        const response = await fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json');                        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                        const data = await response.json();
+                        
+                        const nearest = calcularDistanciaMasCercana(
+                            position.coords.latitude,
+                            position.coords.longitude,
+                            data.markers
+                        );
+                        
+                        actualizarInterfaz(nearest);
+                    } 
+                    catch (error) {
+                        console.error("Error:", error);
+                        distanceElement.textContent = "Error";
+                    }
+                }
+            },
+            (error) => {
+                console.error("Error geolocalización:", error);
+                distanceElement.textContent = "Activa la geolocalización";
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 30000,
+                timeout: 5000
+            }
+        );
+    });
 });
 
 // Función de cálculo de distancia (corregida)
