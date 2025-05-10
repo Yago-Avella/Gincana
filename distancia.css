@@ -48,12 +48,3 @@ body {
     width: 150px;  /* Tamaño más pequeño para móviles */
     height: 150px;
 }
-
-.geo-button {
-    padding: 12px 24px;
-    background: #2c3e50;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    margin-top: 20px;
-}
