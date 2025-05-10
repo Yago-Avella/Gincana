@@ -1,0 +1,83 @@
+{
+  "folders": [
+    {
+      "id": 1,
+      "name": "Sin carpeta",
+      "parentId": null
+    }
+  ],
+  "markers": [
+    {
+      "title": "Playa IES La Mar",
+      "description": "Playa más cercana a IES la mar",
+      "lat": 38.78914399386474,
+      "lng": 0.18198788166046145,
+      "id": 1,
+      "quiz": null
+    },
+    {
+      "title": "Iglesia Xaló",
+      "description": "Iglesia Xaló",
+      "lat": 38.740720286878684,
+      "lng": -0.011780261993408205,
+      "id": 2,
+      "quiz": null
+    },
+    {
+      "title": "Piscina Municipal Xaló",
+      "description": "Piscina Municipal del Pueblo Xaló",
+      "lat": 38.74458635544027,
+      "lng": -0.016940832138061527,
+      "id": 3,
+      "quiz": null
+    },
+    {
+      "title": "Gimnasio Municipal Xaló",
+      "description": "Gimnasio Ubicado en Xaló",
+      "lat": 38.74304246355356,
+      "lng": -0.00801980495452881,
+      "id": 4,
+      "quiz": null
+    },
+    {
+      "title": "Tossalet Xaló",
+      "description": "Montaña en Xaló Donde hay un parque en lo alto",
+      "lat": 38.742008999656,
+      "lng": -0.016967654228210453,
+      "id": 5,
+      "quiz": null
+    },
+    {
+      "title": "Hermita Sant Doménec",
+      "description": "Hermita de Xaló religiosa",
+      "lat": 38.74307175178615,
+      "lng": -0.016452670097351078,
+      "id": 6,
+      "quiz": null
+    },
+    {
+      "title": "Catedral Santiago",
+      "description": "Catedral Historica de Santiago de Compostela",
+      "lat": 42.880512330710786,
+      "lng": -8.545255064964296,
+      "id": 7,
+      "quiz": null
+    },
+    {
+      "title": "Casa WillyRex",
+      "description": "Casa WillyRex",
+      "lat": 42.506780764196904,
+      "lng": 1.5264987945556643,
+      "id": 8,
+      "quiz": null
+    },
+    {
+      "title": "TorreEiffel",
+      "description": "TorreEiffel Ubicada en Francia,París, monumento conocido Mundialmente",
+      "lat": 48.85827053088322,
+      "lng": 2.2944957017898564,
+      "id": 9,
+      "quiz": null
+    }
+  ]
+}
