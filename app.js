@@ -18,8 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 lastUpdate = now;
                 
                 try {
-                    const response = await fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json');
-                    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                    const response = await fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json?t=' + Date.now());                    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
                     const data = await response.json();
                     
                     const nearest = calcularDistanciaMasCercana(
