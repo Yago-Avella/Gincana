@@ -1,6 +1,7 @@
 let lastUpdate = 0;
 let quizActivo = false;
 let marcadorActual = null;
+let marcadoresCompletados = [];
 const UPDATE_INTERVAL = 1000;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -51,6 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Función de cálculo de distancia (corregida)
 function calcularDistanciaMasCercana(userLat, userLng, markers) {
+    const marcadoresDisponibles = markers.filter(m => 
+        !marcadoresCompletados.includes(m.id)
+    );
     if (!markers || markers.length === 0) throw new Error("No hay marcadores");
     
     return markers.reduce((closest, marker) => {
@@ -94,9 +98,15 @@ function actualizarInterfaz(datos) {
     nombreElemento.textContent = datos.title || "Marcador cercano"; 
     console.log("Nombre del marcador:", datos.title, "Coordenadas:", datos.lat, datos.lng);
 
+    if (marcadoresCompletados.includes(datos.id)) return;
+
     if (datos.distance < 10 && datos.quiz && !quizActivo && datos.id !== marcadorActual) {
         mostrarQuiz(datos);
         marcadorActual = datos.id;
+    }
+
+    if (datos.distance < 10 && datos.quiz && !quizActivo) {
+        mostrarQuiz(datos);
     }
 }
 
@@ -109,15 +119,12 @@ function mostrarQuiz(marcador) {
             <div class="quiz-contenido">
                 <h3>${marcador.quiz.question}</h3>
                 <div class="opciones-grid">
-                    ${Object.entries(marcador.quiz.options).map(([opcion, texto]) => `
-                        <button class="opcion" 
-                                data-opcion="${opcion}"
-                                data-correct="${opcion === marcador.quiz.options.correct}">
+                    ${marcador.quiz.options.map((texto, index) => `
+                        <button class="opcion" data-index="${index}">
                             ${texto}
                         </button>
                     `).join('')}
                 </div>
-                <div id="resultado-quiz"></div>
             </div>
         </div>
     `;
@@ -127,25 +134,24 @@ function mostrarQuiz(marcador) {
     // Manejar respuestas
     document.querySelectorAll('.opcion').forEach(boton => {
         boton.addEventListener('click', (e) => {
-            const esCorrecta = e.target.dataset.correct === 'true';
-            const opcionCorrecta = marcador.quiz.options.correct;
+            const indiceSeleccionado = parseInt(e.target.dataset.index);
+            const indiceCorrecto = marcador.quiz.correct;
             
-            // Mostrar todas las respuestas
-            document.querySelectorAll('.opcion').forEach(op => {
-                if (op.dataset.opcion === opcionCorrecta) {
-                    op.classList.add('correcta');
+            // Resaltar respuestas
+            document.querySelectorAll('.opcion').forEach((op, index) => {
+                if (index === indiceCorrecto) {
+                    op.style.backgroundColor = "#2ecc71"; // Verde para correcta
                 }
-                if (op.dataset.opcion === e.target.dataset.opcion && !esCorrecta) {
-                    op.classList.add('incorrecta');
+                if (index === indiceSeleccionado && index !== indiceCorrecto) {
+                    op.style.backgroundColor = "#e74c3c"; // Rojo para incorrecta
                 }
                 op.disabled = true;
             });
 
-            const resultado = document.getElementById('resultado-quiz');
-            resultado.textContent = esCorrecta 
-                ? "✅ ¡Respuesta correcta!" 
-                : "❌ Respuesta incorrecta";
-            resultado.style.color = esCorrecta ? "#2ecc71" : "#e74c3c";
+            if (esCorrecta) {
+                marcadoresCompletados.push(marcador.id);
+                actualizarListaMarcadores(); // Nueva función
+            }
 
             setTimeout(() => {
                 document.querySelector('.quiz-modal').remove();
