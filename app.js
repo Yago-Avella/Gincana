@@ -77,18 +77,22 @@ function haversine(lat1, lon1, lat2, lon2) {
 
 // Función de actualización (REVISADA)
 function actualizarInterfaz(datos) {
-    console.log("Actualizando interfaz con:", datos);
     const distanciaElemento = document.getElementById('distance-value');
+    const nombreElemento = document.getElementById('nombre-marcador');
     
+    // Actualizar distancia
     let distanciaFormateada;
     if (datos.distance < 1000) {
         distanciaFormateada = `${Math.round(datos.distance)}m`;
     } else {
-        distanciaFormateada = `${(datos.distance/1000).toFixed(2).replace('.', ',')}km`; // Formato europeo
+        distanciaFormateada = `${(datos.distance/1000).toFixed(2).replace('.', ',')}km`;
     }
-
     distanciaElemento.textContent = distanciaFormateada;
+
+    // Actualizar nombre del marcador
+    nombreElemento.textContent = datos.title || "Marcador cercano"; 
 }
+
 console.log(haversine(
     38.78914399386474, 0.18198788166046145, // Playa IES La Mar
     38.78914399386474, 0.18198788166046145  // Mismas coordenadas
