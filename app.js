@@ -90,6 +90,7 @@ function actualizarInterfaz(datos) {
 
     // Actualizar nombre del marcador
     nombreElemento.textContent = datos.title || "Marcador cercano"; 
+    console.log("Nombre del marcador:", datos.title, "Coordenadas:", datos.lat, datos.lng);
 }
 
 console.log(haversine(
