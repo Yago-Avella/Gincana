@@ -94,7 +94,16 @@
       "lat": 38.739481761775075,
       "lng": -0.009623765945434572,
       "id": 10,
-      "quiz": null
+      "quiz": {
+        "question": "Es un Piso?",
+        "options": {
+          "a": "Si",
+          "b": "No",
+          "c": "Acelga",
+          "d": "Iguana",
+          "correct": "a"
+        }
+      }
     }
   ]
 }
