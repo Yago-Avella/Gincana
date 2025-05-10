@@ -21,7 +21,16 @@
       "lat": 38.740720286878684,
       "lng": -0.011780261993408205,
       "id": 2,
-      "quiz": null
+      "quiz": {
+        "question": "Cuantas entradas tiene la iglesia?",
+        "options": {
+          "a": "1",
+          "b": "3",
+          "c": "2",
+          "d": "5",
+          "correct": "c"
+        }
+      }
     },
     {
       "title": "Piscina Municipal Xaló",
@@ -77,6 +86,14 @@
       "lat": 48.85827053088322,
       "lng": 2.2944957017898564,
       "id": 9,
+      "quiz": null
+    },
+    {
+      "title": "CasaPruebaYago",
+      "description": "CasaPruebaYago",
+      "lat": 38.739481761775075,
+      "lng": -0.009623765945434572,
+      "id": 10,
       "quiz": null
     }
   ]
