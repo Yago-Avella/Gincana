@@ -91,6 +91,51 @@ function actualizarInterfaz(datos) {
     // Actualizar nombre del marcador
     nombreElemento.textContent = datos.title || "Marcador cercano"; 
     console.log("Nombre del marcador:", datos.title, "Coordenadas:", datos.lat, datos.lng);
+
+    if (datos.distance < 10 && datos.quiz && !quizActivo && datos.id !== marcadorActual) {
+        mostrarQuiz(datos);
+        marcadorActual = datos.id;
+    }
+}
+
+function mostrarQuiz(marcador) {
+    quizActivo = true;
+    
+    // Crear elementos del quiz
+    const quizHTML = `
+        <div class="quiz-modal">
+            <div class="quiz-contenido">
+                <h3>${marcador.quiz.question}</h3>
+                ${Object.entries(marcador.quiz.options).map(([opcion, texto]) => `
+                    <button class="opcion" data-opcion="${opcion}">${texto}</button>
+                `).join('')}
+                <div id="resultado-quiz"></div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', quizHTML);
+    
+    // Manejar respuestas
+    document.querySelectorAll('.opcion').forEach(boton => {
+        boton.addEventListener('click', (e) => {
+            const opcion = e.target.dataset.opcion;
+            const resultado = document.getElementById('resultado-quiz');
+            
+            if (opcion === marcador.quiz.options.correct) {
+                resultado.textContent = "✅ ¡Correcto!";
+                resultado.style.color = "green";
+            } else {
+                resultado.textContent = "❌ Incorrecto. Intenta de nuevo";
+                resultado.style.color = "red";
+            }
+            
+            setTimeout(() => {
+                document.querySelector('.quiz-modal').remove();
+                quizActivo = false;
+            }, 3000);
+        });
+    });
 }
 
 console.log(haversine(
