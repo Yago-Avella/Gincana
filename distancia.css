@@ -62,3 +62,17 @@ body {
     max-width: 250px;
     word-break: break-word;
 }
+
+@media (max-width: 480px) {
+    .nombre-marcador {
+        font-size: 1rem;           /* Tamaño más pequeño */
+        margin: 1rem auto 0;       /* Margen reducido */
+        padding: 8px 12px;         /* Padding ajustado */
+        max-width: 200px;          /* Ancho máximo menor */
+    }
+
+    .distance-circle {
+        width: 130px !important;   /* Tamaño del círculo */
+        height: 130px !important;
+    }
+}
