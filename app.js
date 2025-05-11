@@ -3,8 +3,8 @@ let quizActivo = false;
 let marcadorActual = null;
 let marcadoresCompletados = [];
 const UPDATE_INTERVAL = 1000;
-let puntos = localStorage.getItem('puntosGincana') || 0;
-document.getElementById('contador-puntos').textContent = `Puntos: ${puntos}`;
+let puntosGincana = localStorage.getItem('puntosGincana') || 0;
+document.getElementById('contador-puntos').textContent = `Puntos: ${puntosGincana}`;
 
 document.addEventListener('DOMContentLoaded', () => {
     const distanceElement = document.getElementById('distance-value');
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Función de cálculo de distancia (corregida)
 function calcularDistanciaMasCercana(userLat, userLng, markers) {
     const marcadoresDisponibles = markers.filter(m => 
-        !marcadoresCompletados.includes(m.id) && m.quiz // Solo marcadores con quiz
+        !marcadoresCompletados.includes(m.id) // Solo marcadores no completados
     );
     
     return marcadoresDisponibles.reduce((closest, marker) => {
@@ -157,11 +157,11 @@ function mostrarQuiz(marcador) {
 
             if (esCorrecta) {
                 marcadoresCompletados.push(marcador.id);
-                puntos++;
-                localStorage.setItem('puntosGincana', puntos);
-                document.getElementById('contador-puntos').textContent = `Puntos: ${puntos}`;
+                puntosGincana++; // Usar la variable renombrada
+                localStorage.setItem('puntosGincana', puntosGincana);
+                document.getElementById('contador-puntos').textContent = `Puntos: ${puntosGincana}`;
                 actualizarListaMarcadores();
-            }
+            }       
 
             setTimeout(() => {
                 document.querySelector('.quiz-modal').remove();
