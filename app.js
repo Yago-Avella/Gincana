@@ -53,18 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // Función de cálculo de distancia (corregida)
 function calcularDistanciaMasCercana(userLat, userLng, markers) {
     const marcadoresDisponibles = markers.filter(m => 
-        !marcadoresCompletados.includes(m.id)
+        !marcadoresCompletados.includes(m.id) && m.quiz // Solo marcadores con quiz
     );
-    
-    if (marcadoresDisponibles.length === 0) {
-        return { distance: Infinity, title: "¡Todos los marcadores completados!" };
-    }
     
     return marcadoresDisponibles.reduce((closest, marker) => {
         const distancia = haversine(userLat, userLng, marker.lat, marker.lng);
         return distancia < closest.distance ? 
             { ...marker, distance: distancia } : closest;
-    }, { distance: Infinity });
+    }, { distance: Infinity, title: "Ningún marcador cercano" });
 }
 
 // Función Haversine (REVISADA)
@@ -106,7 +102,7 @@ function actualizarInterfaz(datos) {
         mostrarQuiz(datos);
         marcadorActual = datos.id;
     }
-    
+
 }
 
 function mostrarQuiz(marcador) {
@@ -163,17 +159,19 @@ function mostrarQuiz(marcador) {
     });
 }
 
-function actualizarListaMarcadores(posicion) {
-    fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json?t=' + Date.now())
-        .then(response => response.json())
-        .then(data => {
-            const nuevosDatos = calcularDistanciaMasCercana(
-                posicion.latitude,
-                posicion.longitude,
-                data.markers
-            );
-            actualizarInterfaz(nuevosDatos);
-        });
+function actualizarListaMarcadores() {
+    navigator.geolocation.getCurrentPosition(position => {
+        fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json?t=' + Date.now())
+            .then(response => response.json())
+            .then(data => {
+                const nearest = calcularDistanciaMasCercana(
+                    position.coords.latitude,
+                    position.coords.longitude,
+                    data.markers
+                );
+                actualizarInterfaz(nearest);
+            });
+    });
 }
 
 console.log(haversine(
