@@ -3,6 +3,8 @@ let quizActivo = false;
 let marcadorActual = null;
 let marcadoresCompletados = [];
 const UPDATE_INTERVAL = 1000;
+let puntos = localStorage.getItem('puntosGincana') || 0;
+document.getElementById('contador-puntos').textContent = `Puntos: ${puntos}`;
 
 document.addEventListener('DOMContentLoaded', () => {
     const distanceElement = document.getElementById('distance-value');
@@ -155,6 +157,9 @@ function mostrarQuiz(marcador) {
 
             if (esCorrecta) {
                 marcadoresCompletados.push(marcador.id);
+                puntos++;
+                localStorage.setItem('puntosGincana', puntos);
+                document.getElementById('contador-puntos').textContent = `Puntos: ${puntos}`;
                 actualizarListaMarcadores();
             }
 
