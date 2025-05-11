@@ -108,15 +108,24 @@ function actualizarInterfaz(datos) {
 function mostrarQuiz(marcador) {
     quizActivo = true;
     
-    // Crear elementos del quiz
+    // Extraer opciones y clave correcta
+    const opcionesObj = marcador.quiz.options;
+    const correcta = opcionesObj.correct;
+    const opciones = Object.entries(opcionesObj)
+                          .filter(([key]) => key !== 'correct')
+                          .map(([letra, texto]) => ({ letra, texto }));
+
+    // Construir HTML del quiz
     const quizHTML = `
         <div class="quiz-modal">
             <div class="quiz-contenido">
                 <h3>${marcador.quiz.question}</h3>
                 <div class="opciones-grid">
-                    ${marcador.quiz.options.map((texto, index) => `
-                        <button class="opcion" data-index="${index}">
-                            ${texto}
+                    ${opciones.map(op => `
+                        <button class="opcion" 
+                                data-letra="${op.letra}"
+                                style="background: #3498db;">
+                            ${op.texto}
                         </button>
                     `).join('')}
                 </div>
@@ -125,35 +134,33 @@ function mostrarQuiz(marcador) {
     `;
     
     document.body.insertAdjacentHTML('beforeend', quizHTML);
-    
-    // Manejar respuestas
+
+    // Manejar clics en opciones
     document.querySelectorAll('.opcion').forEach(boton => {
         boton.addEventListener('click', (e) => {
-            const indiceSeleccionado = parseInt(e.target.dataset.index);
-            const indiceCorrecto = marcador.quiz.correct;
+            const letra = e.target.dataset.letra;
+            const esCorrecta = (letra === correcta);
             
             // Resaltar respuestas
-            document.querySelectorAll('.opcion').forEach((op, index) => {
-                if (index === indiceCorrecto) {
-                    op.style.backgroundColor = "#2ecc71"; // Verde para correcta
-                }
-                if (index === indiceSeleccionado && index !== indiceCorrecto) {
-                    op.style.backgroundColor = "#e74c3c"; // Rojo para incorrecta
+            document.querySelectorAll('.opcion').forEach(op => {
+                const opLetra = op.dataset.letra;
+                if (opLetra === correcta) {
+                    op.style.background = "#2ecc71"; // Verde
+                } 
+                else if (opLetra === letra && !esCorrecta) {
+                    op.style.background = "#e74c3c"; // Rojo
                 }
                 op.disabled = true;
             });
 
-            const esCorrecta = (indiceSeleccionado === indiceCorrecto);
-
             if (esCorrecta) {
                 marcadoresCompletados.push(marcador.id);
-                actualizarListaMarcadores(position.coords); // Pasar coordenadas
+                actualizarListaMarcadores();
             }
 
             setTimeout(() => {
                 document.querySelector('.quiz-modal').remove();
                 quizActivo = false;
-                marcadorActual = null;
             }, 3000);
         });
     });
