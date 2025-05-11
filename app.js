@@ -55,14 +55,16 @@ function calcularDistanciaMasCercana(userLat, userLng, markers) {
     const marcadoresDisponibles = markers.filter(m => 
         !marcadoresCompletados.includes(m.id)
     );
-    if (!markers || markers.length === 0) throw new Error("No hay marcadores");
     
-    return markers.reduce((closest, marker) => {
+    if (marcadoresDisponibles.length === 0) {
+        return { distance: Infinity, title: "¡Todos los marcadores completados!" };
+    }
+    
+    return marcadoresDisponibles.reduce((closest, marker) => {
         const distancia = haversine(userLat, userLng, marker.lat, marker.lng);
         return distancia < closest.distance ? 
-            { ...marker, distance: distancia } : // Retorna todo el marcador + distancia
-            closest;
-    }, { distance: Infinity }); // Inicializa con distancia infinita
+            { ...marker, distance: distancia } : closest;
+    }, { distance: Infinity });
 }
 
 // Función Haversine (REVISADA)
@@ -104,10 +106,7 @@ function actualizarInterfaz(datos) {
         mostrarQuiz(datos);
         marcadorActual = datos.id;
     }
-
-    if (datos.distance < 10 && datos.quiz && !quizActivo) {
-        mostrarQuiz(datos);
-    }
+    
 }
 
 function mostrarQuiz(marcador) {
@@ -148,9 +147,11 @@ function mostrarQuiz(marcador) {
                 op.disabled = true;
             });
 
+            const esCorrecta = (indiceSeleccionado === indiceCorrecto);
+
             if (esCorrecta) {
                 marcadoresCompletados.push(marcador.id);
-                actualizarListaMarcadores(); // Nueva función
+                actualizarListaMarcadores(position.coords); // Pasar coordenadas
             }
 
             setTimeout(() => {
@@ -160,6 +161,19 @@ function mostrarQuiz(marcador) {
             }, 3000);
         });
     });
+}
+
+function actualizarListaMarcadores(posicion) {
+    fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json?t=' + Date.now())
+        .then(response => response.json())
+        .then(data => {
+            const nuevosDatos = calcularDistanciaMasCercana(
+                posicion.latitude,
+                posicion.longitude,
+                data.markers
+            );
+            actualizarInterfaz(nuevosDatos);
+        });
 }
 
 console.log(haversine(
