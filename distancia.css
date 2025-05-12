@@ -184,3 +184,17 @@ body {
     font-weight: 600;
     font-size: 1.1rem;
 }
+
+.contador-racha {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: #e67e22;  /* Color naranja */
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-weight: bold;
+}
