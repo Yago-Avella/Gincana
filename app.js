@@ -1,68 +1,61 @@
-let lastUpdate = 0;
-let quizActivo = false;
-let marcadorActual = null;
-let marcadoresCompletados = [];
-const UPDATE_INTERVAL = 1000;
-let puntosGincana = localStorage.getItem('puntosGincana') || 0;
-document.getElementById('contador-puntos').textContent = `Puntos: ${puntosGincana}`;
-
 document.addEventListener('DOMContentLoaded', () => {
     const distanceElement = document.getElementById('distance-value');
-    distanceElement.textContent = "0m";
+    const equationElement = document.querySelector('.equation');
+
+    // Debug: Estado inicial
+    console.log("Iniciando geolocalización...");
+    distanceElement.textContent = "Calculando...";
+    equationElement.textContent = "Buscando tu ubicación";
 
     if (!navigator.geolocation) {
-        distanceElement.textContent = "Error navegador";
+        console.error("Geolocalización no soportada");
+        distanceElement.textContent = "Error en navegador";
         return;
     }
 
-    // Activar geolocalización automáticamente
-    navigator.geolocation.watchPosition(
+    navigator.geolocation.getCurrentPosition(
         async (position) => {
-            const now = Date.now();
-            if (now - lastUpdate > UPDATE_INTERVAL) {
-                lastUpdate = now;
+            try {
+                // Debug: Coordenadas obtenidas
+                console.log("Ubicación obtenida:", position.coords.latitude, position.coords.longitude);
                 
-                try {
-                    const response = await fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json?t=' + Date.now());                    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-                    const data = await response.json();
-                    
-                    const nearest = calcularDistanciaMasCercana(
-                        position.coords.latitude,
-                        position.coords.longitude,
-                        data.markers
-                    );
-                    
-                    actualizarInterfaz(nearest);
-                } 
-                catch (error) {
-                    console.error("Error:", error);
-                    distanceElement.textContent = "Error";
-                }
+                const response = await fetch('locations.json');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                console.log("Marcadores cargados:", data.markers.length);
+                
+                const nearest = calcularDistanciaMasCercana(
+                    position.coords.latitude,
+                    position.coords.longitude,
+                    data.markers
+                );
+                
+                console.log("Marcador más cercano:", nearest);
+                actualizarInterfaz(nearest);
+            } 
+            catch (error) {
+                console.error("Error crítico:", error);
+                distanceElement.textContent = "Error de datos";
+                equationElement.textContent = "(7, z + m)";
             }
         },
         (error) => {
             console.error("Error geolocalización:", error);
+            equationElement.textContent = "(7, z + m)";
             distanceElement.textContent = "Activa la geolocalización";
-        },
-        {
-            enableHighAccuracy: true,
-            maximumAge: 30000,
-            timeout: 5000
         }
     );
 });
 
-// Función de cálculo de distancia (corregida)
+// Función de cálculo de distancia (REVISADA)
 function calcularDistanciaMasCercana(userLat, userLng, markers) {
-    const marcadoresDisponibles = markers.filter(m => 
-        !marcadoresCompletados.includes(m.id) // Solo marcadores no completados
-    );
+    if (!markers || markers.length === 0) throw new Error("No hay marcadores");
     
-    return marcadoresDisponibles.reduce((closest, marker) => {
+    return markers.reduce((closest, marker) => {
         const distancia = haversine(userLat, userLng, marker.lat, marker.lng);
-        return distancia < closest.distance ? 
-            { ...marker, distance: distancia } : closest;
-    }, { distance: Infinity, title: "Ningún marcador cercano" });
+        return distancia < closest.distance ? { title: marker.title, distance } : closest;
+    }, { distance: Infinity, title: "" });
 }
 
 // Función Haversine (REVISADA)
@@ -82,117 +75,16 @@ function haversine(lat1, lon1, lat2, lon2) {
 
 // Función de actualización (REVISADA)
 function actualizarInterfaz(datos) {
+    console.log("Actualizando interfaz con:", datos);
     const distanciaElemento = document.getElementById('distance-value');
-    const nombreElemento = document.getElementById('nombre-marcador');
     
-    // Actualizar distancia
     let distanciaFormateada;
     if (datos.distance < 1000) {
         distanciaFormateada = `${Math.round(datos.distance)}m`;
     } else {
-        distanciaFormateada = `${(datos.distance/1000).toFixed(2).replace('.', ',')}km`;
+        distanciaFormateada = `${(datos.distance/1000).toFixed(2).replace('.', ',')}km`; // Formato europeo
     }
+
     distanciaElemento.textContent = distanciaFormateada;
-
-    // Actualizar nombre del marcador
-    nombreElemento.textContent = datos.title || "Marcador cercano"; 
-    console.log("Nombre del marcador:", datos.title, "Coordenadas:", datos.lat, datos.lng);
-
-    if (marcadoresCompletados.includes(datos.id)) return;
-
-    if (datos.distance < 10 && datos.quiz && !quizActivo && datos.id !== marcadorActual) {
-        mostrarQuiz(datos);
-        marcadorActual = datos.id;
-    }
-
+    document.querySelector('.equation').textContent = datos.title || "(7, z + m)";
 }
-
-function mostrarQuiz(marcador) {
-    quizActivo = true;
-    
-    // Extraer opciones y clave correcta
-    const opcionesObj = marcador.quiz.options;
-    const correcta = opcionesObj.correct;
-    const opciones = Object.entries(opcionesObj)
-                          .filter(([key]) => key !== 'correct')
-                          .map(([letra, texto]) => ({ letra, texto }));
-
-    // Construir HTML del quiz
-    const quizHTML = `
-        <div class="quiz-modal">
-            <div class="quiz-contenido">
-                <h3>${marcador.quiz.question}</h3>
-                <div class="opciones-grid">
-                    ${opciones.map(op => `
-                        <button class="opcion" 
-                                data-letra="${op.letra}"
-                                style="background: #3498db;">
-                            ${op.texto}
-                        </button>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', quizHTML);
-
-    // Manejar clics en opciones
-    document.querySelectorAll('.opcion').forEach(boton => {
-        boton.addEventListener('click', (e) => {
-            const letra = e.target.dataset.letra;
-            const esCorrecta = (letra === correcta);
-            
-            // Resaltar respuestas
-            document.querySelectorAll('.opcion').forEach(op => {
-                const opLetra = op.dataset.letra;
-                if (opLetra === correcta) {
-                    op.style.background = "#2ecc71"; // Verde
-                } 
-                else if (opLetra === letra && !esCorrecta) {
-                    op.style.background = "#e74c3c"; // Rojo
-                }
-                op.disabled = true;
-            });
-
-            if (esCorrecta) {
-                marcadoresCompletados.push(marcador.id);
-                puntosGincana++; // Usar la variable renombrada
-                localStorage.setItem('puntosGincana', puntosGincana);
-                document.getElementById('contador-puntos').textContent = `Puntos: ${puntosGincana}`;
-                actualizarListaMarcadores();
-            }       
-
-            setTimeout(() => {
-                document.querySelector('.quiz-modal').remove();
-                quizActivo = false;
-            }, 3000);
-        });
-    });
-}
-
-function actualizarListaMarcadores() {
-    navigator.geolocation.getCurrentPosition(position => {
-        fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json?t=' + Date.now())
-            .then(response => response.json())
-            .then(data => {
-                const nearest = calcularDistanciaMasCercana(
-                    position.coords.latitude,
-                    position.coords.longitude,
-                    data.markers
-                );
-                actualizarInterfaz(nearest);
-            });
-    });
-}
-
-console.log(haversine(
-    38.78914399386474, 0.18198788166046145, // Playa IES La Mar
-    38.78914399386474, 0.18198788166046145  // Mismas coordenadas
-));
-
-// Distancia Madrid-Barcelona (debería dar ~483,000m)
-console.log(haversine(
-    38.7409, -0.0123,  // Iglesia Xaló (corregida)
-    38.7409, -0.0123   // Misma ubicación
-  ));
