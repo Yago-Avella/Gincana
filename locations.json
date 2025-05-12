@@ -85,7 +85,16 @@
       "lat": 38.788514001497184,
       "lng": 0.17814148600667773,
       "id": 10,
-      "quiz": null
+      "quiz": {
+        "question": "Cuantas pizarras hay en clase",
+        "options": {
+          "a": "1",
+          "b": "2",
+          "c": "3",
+          "d": "4",
+          "correct": "a"
+        }
+      }
     }
   ]
 }
