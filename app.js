@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 lastUpdate = now;
                 
                 try {
-                    const response = await fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json?t=' + Date.now());                    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-                    const data = await response.json();
+// En app.js, modificar el fetch:
+const response = await fetch('https://raw.githubusercontent.com/Yago-Avella/Gincana/main/locations.json?t=' + Date.now());                    const data = await response.json();
                     
                     const nearest = calcularDistanciaMasCercana(
                         position.coords.latitude,
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Función de cálculo de distancia (corregida)
 function calcularDistanciaMasCercana(userLat, userLng, markers) {
     const marcadoresDisponibles = markers.filter(m => 
-        !marcadoresCompletados.includes(m.id) && m.quiz // Solo marcadores con quiz
+        !marcadoresCompletados.includes(m.id)// && m.quiz
     );
     
     return marcadoresDisponibles.reduce((closest, marker) => {
@@ -161,6 +161,7 @@ function mostrarQuiz(marcador) {
             setTimeout(() => {
                 document.querySelector('.quiz-modal').remove();
                 quizActivo = false;
+                marcadorActual = null;
             }, 3000);
         });
     });
