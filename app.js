@@ -3,6 +3,7 @@ let quizActivo = false;
 let marcadorActual = null;
 let marcadoresCompletados = [];
 const UPDATE_INTERVAL = 1000;
+let puntuacionRacha = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
     const distanceElement = document.getElementById('distance-value');
@@ -154,8 +155,13 @@ function mostrarQuiz(marcador) {
             });
 
             if (esCorrecta) {
+                puntuacionRacha++; // Aumenta la racha
+                document.getElementById('contador-racha').textContent = `Racha: ${puntuacionRacha}`;
                 marcadoresCompletados.push(marcador.id);
                 actualizarListaMarcadores();
+            }else {
+                puntuacionRacha = 0; // Reinicia la racha
+                document.getElementById('contador-racha').textContent = `Racha: 0`;
             }
 
             setTimeout(() => {
