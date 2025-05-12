@@ -27,9 +27,16 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 480px) {
+    .distance-circle {
+        width: 180px;  /* Aumentado de 150px */
+        height: 180px;
+    }
+}
+
 .center-circle {
-    width: 80px;
-    height: 80px;
+    width: 150px;  /* Aumentado de 80px */
+    height: 150px;
     border-radius: 50%;
     background-color: #ffffff;
     display: flex;
@@ -45,8 +52,15 @@ body {
 }
 
 .distance-circle {
-    width: 150px;  /* Tamaño más pequeño para móviles */
-    height: 150px;
+    width: 220px;  /* Aumentado de 200px */
+    height: 220px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .nombre-marcador {
