@@ -21,16 +21,7 @@
       "lat": 38.740720286878684,
       "lng": -0.011780261993408205,
       "id": 2,
-      "quiz": {
-        "question": "Cuantas entradas tiene la iglesia?",
-        "options": {
-          "a": "1",
-          "b": "3",
-          "c": "2",
-          "d": "5",
-          "correct": "c"
-        }
-      }
+      "quiz": null
     },
     {
       "title": "Piscina Municipal Xaló",
@@ -89,21 +80,12 @@
       "quiz": null
     },
     {
-      "title": "CasaPruebaYago",
-      "description": "CasaPruebaYago",
-      "lat": 38.739481761775075,
-      "lng": -0.009623765945434572,
+      "title": "Clase DAW",
+      "description": "Clase De Daw en Jave, donde estudian los mejores estudiantes de la década",
+      "lat": 38.788514001497184,
+      "lng": 0.17814148600667773,
       "id": 10,
-      "quiz": {
-        "question": "Es un Piso?",
-        "options": {
-          "a": "Si",
-          "b": "No",
-          "c": "Acelga",
-          "d": "Iguana",
-          "correct": "a"
-        }
-      }
+      "quiz": null
     }
   ]
 }
